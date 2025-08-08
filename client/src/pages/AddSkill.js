@@ -30,7 +30,7 @@ function AddSkill() {
       });
       navigate('/');
     } catch (err) {
-      alert('Error adding skill');
+      alert('Error adding the skill');
     }
   };
 
