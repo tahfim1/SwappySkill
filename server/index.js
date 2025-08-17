@@ -1,24 +1,38 @@
 import express from 'express';
+import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import cors from 'cors';
-import authRoutes from './routes/auth.js';
+
 import skillRoutes from './routes/skills.js';
+import authRoutes from './routes/auth.js';
+import sessionRoutes from './routes/sessions.js';
+import offerRoutes from './routes/offers.js';
+import messageRoutes from './routes/messages.js';
+import pointRoutes from './routes/points.js';
 
 dotenv.config();
 
 const app = express();
+
+// Middlewares
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/skills', skillRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/offers', offerRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/points', pointRoutes);
+
+// DB + server
+const MONGO_URL = process.env.MONGO_URL;
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(express.json()); // 👈 Ensure this is here before routes
-
-app.use('/api/auth', authRoutes);     // http://localhost:5000/api/auth/login or /register
-app.use('/api/skills', skillRoutes);  // your skills routes
-
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(MONGO_URL)
   .then(() => {
-    console.log('✅ Connected to MongoDB');
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    console.log('MongoDB connected');
+    app.listen(PORT, () => console.log('Server running on port ' + PORT));
   })
-  .catch((err) => console.error('MongoDB connection failed:', err));
+  .catch(err => console.error(err));
