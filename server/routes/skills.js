@@ -24,6 +24,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
+
 // POST new skill
 router.post('/', async (req, res) => {
   try {

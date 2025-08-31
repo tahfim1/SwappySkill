@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import PointTransaction from '../models/PointTransaction.js';
+import { createNotification } from '../utils/createNotification.js';
 
 const router = express.Router();
 
@@ -18,18 +19,29 @@ router.get('/balance/:username', async (req, res) => {
   }
 });
 
-// (Optional) Admin bonus
+// Admin bonus (or any point addition)
 router.post('/bonus', async (req, res) => {
   try {
     const { username, amount, note } = req.body;
     const user = await User.findOne({ username });
     if (!user) return res.status(404).json({ message: 'User not found' });
-    user.points = (user.points || 0) + Number(amount || 0);
+
+    const bonusAmount = Number(amount || 0);
+    user.points = (user.points || 0) + bonusAmount;
     await user.save();
 
     await PointTransaction.create({
-      username, type: 'bonus', amount: Math.abs(amount), note: note || 'Admin bonus'
+      username,
+      type: 'bonus',
+      amount: Math.abs(bonusAmount),
+      note: note || 'Admin bonus'
     });
+
+    // Notify the user about point addition
+    await createNotification(
+      user._id,
+      `You received ${bonusAmount} points. Reason: ${note || 'Admin bonus'}`
+    );
 
     res.json({ balance: user.points });
   } catch (err) {

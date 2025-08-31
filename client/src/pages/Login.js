@@ -1,35 +1,64 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+// client/src/pages/Login.js
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function Login({ onLogin }) {
-  const [form, setForm] = useState({ username: '', password: '' });
+export default function Login({ onLogin }) {
+  const [username, setUsername] = useState("");  // ⬅️ was email
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = e =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', form);
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('username', res.data.username);
-      onLogin(res.data.username);
-      navigate('/');
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        username,   // ⬅️ send username, not email
+        password,
+      });
+
+      // ✅ Save token, username, and userId
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("username", res.data.user.username);
+      localStorage.setItem("userId", res.data.user._id);
+
+      // ✅ Pass username + id to App.js
+      onLogin(res.data.user.username, res.data.user._id);
+
+      navigate("/"); // redirect to home after login
     } catch (err) {
-      alert(err.response?.data?.message || 'Login failed');
+      setError("Invalid username or password");  // ⬅️ updated message
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <input name="username" placeholder="Username" onChange={handleChange} />
-      <input type="password" name="password" placeholder="Password" onChange={handleChange} />
-      <button type="submit">Login</button>
-    </form>
+    <div className="p-6 max-w-md mx-auto">
+      <h2 className="text-xl font-bold mb-4">Login</h2>
+      {error && <p className="text-red-500">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"   // ⬅️ was "email"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="border rounded w-full px-2 py-1 mb-3"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="border rounded w-full px-2 py-1 mb-3"
+          required
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Login
+        </button>
+      </form>
+    </div>
   );
 }
-
-export default Login;

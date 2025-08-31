@@ -1,3 +1,4 @@
+/* === General Styles === */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -65,6 +66,7 @@ form button:hover {
   background-color: #205e5d;
 }
 
+/* Skill Cards */
 .skill-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -91,5 +93,164 @@ form button:hover {
   text-align: center;
   margin-top: 2rem;
   font-size: 1.5rem;
+  color: #555;
+}
+
+/* === Page Container === */
+.page-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* === Search Page === */
+.page {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.25rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.search-input:focus {
+  border-color: #2b7a78;
+  box-shadow: 0 0 0 3px rgba(43,122,120,0.25);
+  outline: none;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  padding: 0.65rem;
+  border: none;
+  border-radius: 8px;
+  background: #2b7a78;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-primary:hover {
+  background: #205e5d;
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  padding: 0.65rem;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  color: #333;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.results-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.result-card {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.result-card .meta {
+  color: #666;
+}
+
+.result-card .desc {
+  margin-top: 0.4rem;
+  color: #444;
+}
+
+.no-result {
+  text-align: center;
+  color: #777;
+  padding: 1rem 0;
+}
+
+.error-text {
+  color: #d93025;
+  margin: 0.5rem 0;
+}
+
+/* === Rating Page === */
+.rating-card {
+  background: #f9f9f9;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.rating-stars {
+  color: #f39c12;
+  font-size: 1.2rem;
+}
+
+/* === Notifications Page === */
+.notification-card {
+  background: #eef6ff;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #cce0ff;
+}
+
+.notification-card.unread {
+  background: #d6ebff;
+  font-weight: bold;
+}
+
+/* === Profile Page === */
+.profile-container {
+  text-align: center;
+}
+
+.profile-container img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 3px solid #007bff;
+}
+
+.profile-container h2 {
+  margin: 0.5rem 0;
+}
+
+.profile-container p {
   color: #555;
 }

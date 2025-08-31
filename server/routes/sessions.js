@@ -3,6 +3,7 @@ import Session from '../models/Session.js';
 import Skill from '../models/skill.js';
 import User from '../models/User.js';
 import PointTransaction from '../models/PointTransaction.js';
+import { createNotification } from '../utils/createNotification.js'; // <-- helper for notifications
 
 const router = express.Router();
 
@@ -15,8 +16,12 @@ async function adjustPoints(username, delta, note, type) {
   user.points = (user.points || 0) + delta;
   await user.save();
   await PointTransaction.create({
-    username, type, amount: Math.abs(delta), note
+    username,
+    type,
+    amount: Math.abs(delta),
+    note
   });
+  return user._id; // return userId for notifications
 }
 
 /**
@@ -34,8 +39,15 @@ router.post('/', async (req, res) => {
       skillTitle: skill.title,
       ownerUsername: skill.createdBy,
       requesterUsername,
-      scheduledAt
+      scheduledAt,
+      status: 'Pending'
     });
+
+    // Notify skill owner
+    const owner = await User.findOne({ username: skill.createdBy });
+    if (owner) {
+      await createNotification(owner._id, `${requesterUsername} requested a session for "${skill.title}"`);
+    }
 
     res.status(201).json(session);
   } catch (err) {
@@ -84,7 +96,10 @@ router.put('/:id/accept', async (req, res) => {
     await session.save();
 
     // Deduct points from requester
-    await adjustPoints(session.requesterUsername, -10, `Booked session: ${session.skillTitle}`, 'spend');
+    const requesterId = await adjustPoints(session.requesterUsername, -10, `Booked session: ${session.skillTitle}`, 'spend');
+
+    // Notify requester
+    await createNotification(requesterId, `Your session "${session.skillTitle}" has been accepted by ${session.ownerUsername}`);
 
     res.json(session);
   } catch (err) {
@@ -101,11 +116,21 @@ router.put('/:id/cancel', async (req, res) => {
     if (!session) return res.status(404).json({ message: 'Session not found' });
 
     if (session.status === 'Accepted') {
-      await adjustPoints(session.requesterUsername, +10, `Refund for cancelled session: ${session.skillTitle}`, 'refund');
+      const requesterId = await adjustPoints(session.requesterUsername, +10, `Refund for cancelled session: ${session.skillTitle}`, 'refund');
+
+      // Notify requester about refund
+      await createNotification(requesterId, `Your session "${session.skillTitle}" was cancelled. Points refunded.`);
     }
 
     session.status = 'Cancelled';
     await session.save();
+
+    // Notify owner
+    const owner = await User.findOne({ username: session.ownerUsername });
+    if (owner) {
+      await createNotification(owner._id, `Session "${session.skillTitle}" has been cancelled.`);
+    }
+
     res.json(session);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -124,7 +149,16 @@ router.put('/:id/complete', async (req, res) => {
     await session.save();
 
     // Award points to owner
-    await adjustPoints(session.ownerUsername, +10, `Completed session: ${session.skillTitle}`, 'earn');
+    const ownerId = await adjustPoints(session.ownerUsername, +10, `Completed session: ${session.skillTitle}`, 'earn');
+
+    // Notify owner
+    await createNotification(ownerId, `You earned points for completing session "${session.skillTitle}"`);
+
+    // Notify requester
+    const requester = await User.findOne({ username: session.requesterUsername });
+    if (requester) {
+      await createNotification(requester._id, `Your session "${session.skillTitle}" has been marked as completed`);
+    }
 
     res.json(session);
   } catch (err) {

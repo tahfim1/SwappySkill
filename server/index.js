@@ -9,6 +9,14 @@ import sessionRoutes from './routes/sessions.js';
 import offerRoutes from './routes/offers.js';
 import messageRoutes from './routes/messages.js';
 import pointRoutes from './routes/points.js';
+import ratingRoutes from "./routes/ratings.js";
+import notificationRoutes from "./routes/notifications.js";
+import userRoutes from "./routes/users.js";
+import searchRoutes from "./routes/search.js";
+
+// ...
+
+
 
 dotenv.config();
 
@@ -25,6 +33,10 @@ app.use('/api/sessions', sessionRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/points', pointRoutes);
+app.use("/api/ratings", ratingRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/search", searchRoutes);
 
 // DB + server
 const MONGO_URL = process.env.MONGO_URL;
