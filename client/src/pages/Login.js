@@ -1,10 +1,9 @@
-// client/src/pages/Login.js
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Login({ onLogin }) {
-  const [username, setUsername] = useState("");  // ⬅️ was email
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -13,21 +12,17 @@ export default function Login({ onLogin }) {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", {
-        username,   // ⬅️ send username, not email
+        username,
         password,
       });
-
-      // ✅ Save token, username, and userId
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("username", res.data.user.username);
       localStorage.setItem("userId", res.data.user._id);
-
-      // ✅ Pass username + id to App.js
       onLogin(res.data.user.username, res.data.user._id);
 
-      navigate("/"); // redirect to home after login
+      navigate("/");
     } catch (err) {
-      setError("Invalid username or password");  // ⬅️ updated message
+      setError("Invalid username or password");
     }
   };
 
@@ -37,7 +32,7 @@ export default function Login({ onLogin }) {
       {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={handleSubmit}>
         <input
-          type="text"   // ⬅️ was "email"
+          type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
